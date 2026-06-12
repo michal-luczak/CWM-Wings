@@ -1,0 +1,6 @@
+name: CWM-Wings
+version: '${version}'
+
+main: dev.codewithmike.wings.CWMWings
+api-version: '1.21'
+load: POSTWORLD
