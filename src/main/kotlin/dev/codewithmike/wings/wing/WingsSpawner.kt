@@ -48,7 +48,7 @@ class WingsSpawner(
         var tick = 0.0
 
         Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, Runnable {
-            val angle = Math.toRadians(30.0) * (sin(tick) + 1)
+            val angle = Math.toRadians(25.0) * (sin(tick) + 1)
             armorStand.setRotation(player.yaw, 0f)
             armorStand.leftArmPose = EulerAngle(0.0, angle, 0.0)
             armorStand.rightArmPose = EulerAngle(0.0, -angle, 0.0)
