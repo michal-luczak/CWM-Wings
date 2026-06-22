@@ -34,7 +34,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: CWM-Wings-${{ github.ref_name }}
-          path: build/libs/*.jar
+          path: build/libs/*-all.jar
           retention-days: 30
 
       - name: Determine if Pre-release
