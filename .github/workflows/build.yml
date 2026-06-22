@@ -65,7 +65,7 @@ jobs:
           while [ $COUNT -lt $MAX_RETRIES ]; do
             sleep 10
             if [ -f "$LOG_FILE" ]; then
-              if grep -q "Enabled CWM-Wings" "$LOG_FILE"; then
+              if grep -q "CWM-Wings has been enabled successfully!" "$LOG_FILE"; then
                 echo "CWM-Wings has been enabled successfully!"
                 LOADED=true
                 break
