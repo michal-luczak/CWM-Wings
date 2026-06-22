@@ -56,14 +56,14 @@ tasks {
         pluginJars.from(shadowJar)
     }
 
-version = System.getenv("GITHUB_REF_NAME")?.removePrefix("v") ?: "0.1.0-SNAPSHOT"
+    version = System.getenv("GITHUB_REF_NAME")?.removePrefix("v") ?: "0.1.0-SNAPSHOT"
 
-processResources {
-    val props = mapOf("version" to version)
-    filesMatching("plugin.yml") {
-        expand(props)
+    processResources {
+        val props = mapOf("version" to version)
+        filesMatching("plugin.yml") {
+            expand(props)
+        }
     }
-}
 }
 
 spotless {
