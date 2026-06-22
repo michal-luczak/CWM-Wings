@@ -50,6 +50,7 @@ jobs:
       - name: Generate Changelog
         id: changelog
         uses: requarks/changelog-action@v1
+        continue-on-error: true
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ github.ref_name }}
@@ -59,6 +60,7 @@ jobs:
         with:
           name: Release ${{ github.ref_name }}
           body: ${{ steps.changelog.outputs.changelog }}
+          generate_release_notes: true
           prerelease: ${{ steps.check_prerelease.outputs.is_prerelease }}
           files: |
             build/libs/*-all.jar
