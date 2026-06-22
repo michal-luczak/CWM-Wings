@@ -16,10 +16,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up JDK 21
+      - name: Set up JDK 25
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
+          java-version: '25'
           distribution: 'temurin'
           cache: 'gradle'
 
@@ -34,15 +34,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        minecraft-version: [ "1.21.4", "26.1.2" ]
+        minecraft-version: [ "1.20.4", "1.21.1", "1.21.4", "26.1.2" ]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up JDK 21
+      - name: Set up JDK 25
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
+          java-version: '25'
           distribution: 'temurin'
           cache: 'gradle'
 
@@ -70,8 +70,10 @@ jobs:
                 LOADED=true
                 break
               fi
-              if grep -q "ERROR" "$LOG_FILE" || grep -q "Exception" "$LOG_FILE"; then
-                if grep -q "CWM-Wings" "$LOG_FILE"; then
+              # Detect errors while ignoring false positives like the EULA agreement warning
+              if grep -E "ERROR|Exception" "$LOG_FILE" | grep -v "EULA agreement flag" | grep -q ""; then
+                # If there's an error, check if it's likely related to our plugin
+                if grep -E "ERROR|Exception" "$LOG_FILE" | grep -v "EULA agreement flag" | grep -q "CWM-Wings"; then
                   echo "Error detected in logs related to CWM-Wings!"
                   cat "$LOG_FILE"
                   kill $SERVER_PID
