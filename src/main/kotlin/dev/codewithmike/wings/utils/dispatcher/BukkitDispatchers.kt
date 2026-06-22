@@ -8,8 +8,8 @@ object BukkitDispatchers {
 
     private var mainDispatcher: CoroutineDispatcher? = null
 
-    fun init(plugin: CWMWings) {
-        mainDispatcher = BukkitMainDispatcher(plugin)
+    fun init() {
+        mainDispatcher = BukkitMainDispatcher(CWMWings.instance)
     }
 
     val main: CoroutineDispatcher

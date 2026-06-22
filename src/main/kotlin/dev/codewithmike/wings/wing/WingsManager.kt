@@ -7,14 +7,12 @@ import dev.codewithmike.wings.utils.dispatcher.BukkitDispatchers
 import kotlinx.coroutines.withContext
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
-import org.bukkit.entity.ArmorStand
+import org.bukkit.Sound.BLOCK_AMETHYST_BLOCK_RESONATE
 import org.bukkit.entity.Player
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
-class WingsManager(
-    private val wingsSpawner: WingsSpawner
-) {
+class WingsManager {
 
     private val wingEntities: MutableMap<UUID, Wings> = ConcurrentHashMap()
 
@@ -38,8 +36,9 @@ class WingsManager(
             )
             withContext(BukkitDispatchers.main) {
                 offlinePlayer.player?.let { player ->
-                    despawnWingsByPlayerUuid(uuid)
+                    despawnWingsByPlayer(player)
                     spawnWings(player, wingsDefinition.itemModel, wingsDefinition.wingsDefinitionId)
+                    player.playSound(player, BLOCK_AMETHYST_BLOCK_RESONATE, 1f, 1f)
                 }
             }
             WingsAdminCommand.WingsResult.success()
@@ -67,8 +66,8 @@ class WingsManager(
                 PlayerWingsRepository.revoke(playerUuid)
             }
             withContext(BukkitDispatchers.main) {
-                offlinePlayer.player?.let { _ ->
-                    despawnWingsByPlayerUuid(playerUuid)
+                offlinePlayer.player?.let { player ->
+                    despawnWingsByPlayer(player)
                 }
             }
             WingsAdminCommand.WingsResult.success()
@@ -79,16 +78,17 @@ class WingsManager(
 
     fun despawnAllWings() {
         wingEntities.forEach { (_, wings) ->
-            wings.armorStand.remove()
+            wings.despawn()
         }
         wingEntities.clear()
     }
 
-    suspend fun despawnWingsByPlayerUuid(uuid: UUID) {
+    suspend fun despawnWingsByPlayer(player: Player) {
+        val uniqueId = player.uniqueId
         withContext(BukkitDispatchers.main) {
-            wingEntities.containsKey(uuid).let {
-                wingEntities[uuid]?.armorStand?.remove()
-                wingEntities.remove(uuid)
+            wingEntities.containsKey(player.uniqueId).let {
+                wingEntities[uniqueId]?.despawn()
+                wingEntities.remove(uniqueId)
             }
         }
     }
@@ -155,6 +155,9 @@ class WingsManager(
                 PlayerWingsRepository.turnOnWings(playerUuid)
             }
         }
+        withContext(BukkitDispatchers.main) {
+            Bukkit.getOfflinePlayer(playerUuid).player?.let { spawnWings(it) }
+        }
     }
 
     suspend fun turnOffWings(playerUuid: UUID) {
@@ -163,13 +166,15 @@ class WingsManager(
                 PlayerWingsRepository.turnOffWings(playerUuid)
             }
         }
+        withContext(BukkitDispatchers.main) {
+            Bukkit.getOfflinePlayer(playerUuid).player?.let { despawnWingsByPlayer(it) }
+        }
     }
 
     private fun despawnWingsByDefinition(wingsName: String) {
-        // TODO optimize
         wingEntities.forEach { (playerUuid, wings) ->
             if (wings.wingsDefinitionId == wingsName) {
-                wings.armorStand.remove()
+                wings.despawn()
                 wingEntities.remove(playerUuid)
             }
         }
@@ -177,10 +182,7 @@ class WingsManager(
 
     private fun spawnWings(player: Player, itemModel: String, wingsDefinitionId: String) {
         val uuid = player.uniqueId
-        val armorStand = wingsSpawner.spawnWings(player, itemModel)
-        wingEntities[uuid]?.armorStand?.remove()
-        wingEntities[uuid] = Wings(armorStand, itemModel, wingsDefinitionId)
+        wingEntities[uuid]?.despawn()
+        wingEntities[uuid] = Wings(itemModel, wingsDefinitionId, player)
     }
-
-    private data class Wings(val armorStand: ArmorStand, val itemModel: String, val wingsDefinitionId: String)
 }

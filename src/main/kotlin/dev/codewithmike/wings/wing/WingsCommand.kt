@@ -14,6 +14,7 @@ import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
+@Suppress("Unused")
 @Command(name = "wings")
 class WingsCommand(
     private val wingsManager: WingsManager,
@@ -51,7 +52,6 @@ class WingsCommand(
             val doesPlayerHaveWings = wingsManager.doesPlayerHaveWings(sender)
             if (doesPlayerHaveWings) {
                 wingsManager.turnOffWings(sender.uniqueId)
-                wingsManager.despawnWingsByPlayerUuid(sender.uniqueId)
                 sender.sendSuccessMessage("Your wings has been successfully turned off.")
             } else {
                 sender.sendFailureMessage("You don't have any wings!")
@@ -66,7 +66,6 @@ class WingsCommand(
             val doesPlayerHaveWings = wingsManager.doesPlayerHaveWings(sender)
             if (doesPlayerHaveWings) {
                 wingsManager.turnOnWings(sender.uniqueId)
-                wingsManager.spawnWings(sender)
                 sender.sendSuccessMessage("Your wings has been successfully turned on.")
             } else {
                 sender.sendFailureMessage("You don't have any wings!")

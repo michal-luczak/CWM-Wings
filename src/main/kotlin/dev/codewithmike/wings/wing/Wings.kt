@@ -4,31 +4,38 @@ import dev.codewithmike.wings.CWMWings
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
+import org.bukkit.Sound
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
+import org.bukkit.scheduler.BukkitTask
 import org.bukkit.util.EulerAngle
 import kotlin.math.sin
 
-class WingsSpawner(
-    private val plugin: CWMWings,
+class Wings(
+    private val wingsItemModel: String,
+    val wingsDefinitionId: String,
+    private val owner: Player
 ) {
 
-    fun spawnWings(player: Player, wingsModel: String): ArmorStand {
+    private val armorStand: ArmorStand = spawnWings()
+    private lateinit var animationTask: BukkitTask
+
+    private fun spawnWings(): ArmorStand {
         val leftWing = ItemStack(Material.DIAMOND).apply {
             itemMeta = itemMeta.apply {
-                itemModel = NamespacedKey.minecraft(wingsModel)
+                itemModel = NamespacedKey.minecraft(wingsItemModel)
             }
         }
         val rightWing = ItemStack(Material.DIAMOND).apply {
             itemMeta = itemMeta.apply {
-                itemModel = NamespacedKey.minecraft(wingsModel)
+                itemModel = NamespacedKey.minecraft(wingsItemModel)
             }
         }
-        val armorStand = player.world.spawnEntity(
-            player.location,
+        val armorStand = owner.world.spawnEntity(
+            owner.location,
             EntityType.ARMOR_STAND
         ) as ArmorStand
 
@@ -47,15 +54,24 @@ class WingsSpawner(
 
         var tick = 0.0
 
-        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, Runnable {
+        animationTask = Bukkit.getScheduler().runTaskTimerAsynchronously(CWMWings.instance, Runnable {
             val angle = Math.toRadians(25.0) * (sin(tick) + 1)
-            armorStand.setRotation(player.yaw, 0f)
+            armorStand.setRotation(owner.yaw, 0f)
             armorStand.leftArmPose = EulerAngle(0.0, angle, 0.0)
             armorStand.rightArmPose = EulerAngle(0.0, -angle, 0.0)
             tick += 0.1
         }, 0L, 1L)
 
-        player.addPassenger(armorStand)
+        owner.addPassenger(armorStand)
+        owner.playSound(owner, Sound.ENTITY_ENDER_DRAGON_FLAP, 1f, 1f)
         return armorStand
+    }
+
+    fun despawn() {
+        animationTask.cancel()
+        owner.playSound(owner, Sound.ENTITY_ENDER_DRAGON_FLAP, 1f, 1f)
+        if (armorStand.isValid) {
+            armorStand.remove()
+        }
     }
 }

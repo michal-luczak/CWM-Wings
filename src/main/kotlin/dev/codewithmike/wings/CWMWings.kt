@@ -10,7 +10,6 @@ import dev.codewithmike.wings.wing.WingsCommand
 import dev.codewithmike.wings.wing.WingsDefinitionArgumentResolver
 import dev.codewithmike.wings.wing.WingsListener
 import dev.codewithmike.wings.wing.WingsManager
-import dev.codewithmike.wings.wing.WingsSpawner
 import dev.rollczi.litecommands.LiteCommands
 import dev.rollczi.litecommands.adventure.LiteAdventureExtension
 import dev.rollczi.litecommands.bukkit.LiteBukkitFactory
@@ -32,12 +31,17 @@ class CWMWings : JavaPlugin() {
     private lateinit var liteCommands: LiteCommands<CommandSender>
     private lateinit var scope: CoroutineScope
 
+    companion object {
+        lateinit var instance: CWMWings private set
+    }
+
     override fun onEnable() {
-        BukkitDispatchers.init(this)
+        instance = this
+        BukkitDispatchers.init()
         scope = CoroutineScope(
             SupervisorJob() + Dispatchers.Default
         )
-        wingsManager = WingsManager(WingsSpawner(this))
+        wingsManager = WingsManager()
 
         val dbConfig = HikariConfig().apply {
             if (!dataFolder.exists()) dataFolder.mkdirs()

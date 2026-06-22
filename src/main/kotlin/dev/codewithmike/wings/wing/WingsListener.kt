@@ -5,6 +5,7 @@ import kotlinx.coroutines.launch
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.entity.EntityToggleGlideEvent
 import org.bukkit.event.entity.EntityToggleSwimEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.PlayerJoinEvent
@@ -34,15 +35,15 @@ class WingsListener(
 
     @EventHandler
     fun onPlayerSwimEvent(event: EntityToggleSwimEvent) {
-        if (event.entity !is Player) return
-        if (event.isSwimming) {
+        val player = event.entity as? Player ?: return
+        if (player.isSwimming) {
             scope.launch {
-                wingsManager.despawnWingsByPlayerUuid(event.entity.uniqueId)
+                wingsManager.despawnWingsByPlayer(player)
             }
         } else {
             scope.launch {
-                if (!wingsManager.doesPlayerHaveWings(event.entity as Player)) return@launch
-                wingsManager.spawnWings(event.entity as Player)
+                if (!wingsManager.doesPlayerHaveWings(player)) return@launch
+                wingsManager.spawnWings(player)
             }
         }
     }
@@ -50,14 +51,26 @@ class WingsListener(
     @EventHandler
     fun onPlayerQuit(event: PlayerQuitEvent) {
         scope.launch {
-            wingsManager.despawnWingsByPlayerUuid(event.player.uniqueId)
+            wingsManager.despawnWingsByPlayer(event.player)
         }
     }
 
     @EventHandler
     fun onPlayerDeath(event: PlayerDeathEvent) {
         scope.launch {
-            wingsManager.despawnWingsByPlayerUuid(event.player.uniqueId)
+            wingsManager.despawnWingsByPlayer(event.player)
+        }
+    }
+
+    @EventHandler
+    fun onPlayerGliding(event: EntityToggleGlideEvent) {
+        val player = event.entity as? Player ?: return
+        scope.launch {
+            if (!event.isGliding) {
+                wingsManager.spawnWings(player)
+            } else {
+                wingsManager.despawnWingsByPlayer(player)
+            }
         }
     }
 }
