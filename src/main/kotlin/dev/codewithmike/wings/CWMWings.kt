@@ -70,6 +70,7 @@ class CWMWings : JavaPlugin() {
             .migrate()
         Database.connect(dataSource)
         getPluginManager().registerEvents(WingsListener(wingsManager, scope), this)
+        logger.info("CWM-Wings has been enabled successfully!")
     }
 
     override fun onDisable() {

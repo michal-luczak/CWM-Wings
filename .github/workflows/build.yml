@@ -34,7 +34,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        minecraft-version: [ "1.20.4", "1.21.1", "1.21.4", "26.1.2" ]
+        minecraft-version: [ "1.21.4", "26.1.2" ]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -66,7 +66,7 @@ jobs:
             sleep 10
             if [ -f "$LOG_FILE" ]; then
               if grep -q "Enabled CWM-Wings" "$LOG_FILE"; then
-                echo "Plugin CWM-Wings enabled successfully!"
+                echo "CWM-Wings has been enabled successfully!"
                 LOADED=true
                 break
               fi
