@@ -19,7 +19,6 @@ class WingsListener(
     @EventHandler
     fun onPlayerJoin(event: PlayerJoinEvent) {
         scope.launch {
-            if (!wingsManager.doesPlayerHaveWings(event.player)) return@launch
             wingsManager.spawnWings(event.player)
         }
     }
@@ -27,7 +26,6 @@ class WingsListener(
     @EventHandler
     fun onPlayerSwimEvent(event: PlayerRespawnEvent) {
         scope.launch {
-            if (!wingsManager.doesPlayerHaveWings(event.player)) return@launch
             wingsManager.spawnWings(event.player)
         }
     }
@@ -35,13 +33,10 @@ class WingsListener(
     @EventHandler
     fun onPlayerSwimEvent(event: EntityToggleSwimEvent) {
         val player = event.entity as? Player ?: return
-        if (player.isSwimming) {
-            scope.launch {
+        scope.launch {
+            if (event.isSwimming) {
                 wingsManager.despawnWingsByPlayer(player)
-            }
-        } else {
-            scope.launch {
-                if (!wingsManager.doesPlayerHaveWings(player)) return@launch
+            } else {
                 wingsManager.spawnWings(player)
             }
         }
