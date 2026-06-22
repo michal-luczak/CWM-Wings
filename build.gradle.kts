@@ -47,20 +47,23 @@ tasks {
     }
 
     runServer {
-        minecraftVersion(libs.versions.minecraft.get())
+        minecraftVersion(project.findProperty("mcVersion")?.toString() ?: libs.versions.minecraft.get())
         jvmArgs(
             "-Xms2G",
             "-Xmx2G",
             "-Dcom.mojang.eula.agree=true",
         )
+        pluginJars.from(shadowJar)
     }
 
-    processResources {
-        val props = mapOf("version" to version)
-        filesMatching("plugin.yml") {
-            expand(props)
-        }
+version = System.getenv("GITHUB_REF_NAME")?.removePrefix("v") ?: "0.1.0-SNAPSHOT"
+
+processResources {
+    val props = mapOf("version" to version)
+    filesMatching("plugin.yml") {
+        expand(props)
     }
+}
 }
 
 spotless {

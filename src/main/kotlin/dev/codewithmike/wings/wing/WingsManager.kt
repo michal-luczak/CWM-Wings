@@ -192,6 +192,7 @@ class WingsManager {
         itemModel: String,
         wingsDefinitionId: String,
     ) {
+        if (player.passengers.any { !it.scoreboardTags.contains("cwm_wings") }) return
         val uuid = player.uniqueId
         wingEntities[uuid]?.despawn()
         wingEntities[uuid] = Wings(itemModel, wingsDefinitionId, player)

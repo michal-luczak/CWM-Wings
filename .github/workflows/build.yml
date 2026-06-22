@@ -1,0 +1,102 @@
+name: Build
+
+on:
+  push:
+    branches: [master"]
+  pull_request:
+    branches: ["master"]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew build shadowJar
+
+  compatibility-test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        minecraft-version: [ "1.21.4", "26.1.2" ]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Run Server and Verify Plugin
+        timeout-minutes: 5
+        run: |
+          # Run server in background using run-paper plugin
+          ./gradlew runServer -PmcVersion=${{ matrix.minecraft-version }} --no-daemon > server.log 2>&1 &
+          SERVER_PID=$!
+          
+          echo "Waiting for server to start..."
+          MAX_RETRIES=30
+          COUNT=0
+          LOADED=false
+          LOG_FILE="run/logs/latest.log"
+          
+          while [ $COUNT -lt $MAX_RETRIES ]; do
+            sleep 10
+            if [ -f "$LOG_FILE" ]; then
+              if grep -q "Enabled CWM-Wings" "$LOG_FILE"; then
+                echo "Plugin CWM-Wings enabled successfully!"
+                LOADED=true
+                break
+              fi
+              if grep -q "ERROR" "$LOG_FILE" || grep -q "Exception" "$LOG_FILE"; then
+                if grep -q "CWM-Wings" "$LOG_FILE"; then
+                  echo "Error detected in logs related to CWM-Wings!"
+                  cat "$LOG_FILE"
+                  kill $SERVER_PID
+                  exit 1
+                fi
+              fi
+            fi
+            
+            # Check if process is still running
+            if ! kill -0 $SERVER_PID 2>/dev/null; then
+              echo "Server process died prematurely."
+              cat server.log
+              [ -f "$LOG_FILE" ] && cat "$LOG_FILE"
+              exit 1
+            fi
+            
+            COUNT=$((COUNT+1))
+          done
+          
+          if [ "$LOADED" = false ]; then
+            echo "Plugin did not enable in time or failed to load."
+            cat server.log
+            [ -f "$LOG_FILE" ] && cat "$LOG_FILE"
+            kill $SERVER_PID
+            exit 1
+          fi
+          
+          kill $SERVER_PID

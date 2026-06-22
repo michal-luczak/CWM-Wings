@@ -55,6 +55,7 @@ class Wings(
         armorStand.setItem(EquipmentSlot.HAND, leftWing)
         armorStand.setItem(EquipmentSlot.OFF_HAND, rightWing)
         armorStand.setArms(true)
+        armorStand.addScoreboardTag("cwm_wings")
 
         var tick = 0.0
 

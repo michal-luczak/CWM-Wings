@@ -1,16 +1,20 @@
 package dev.codewithmike.wings.wing
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.entity.EntityDismountEvent
+import org.bukkit.event.entity.EntityMountEvent
 import org.bukkit.event.entity.EntityToggleGlideEvent
 import org.bukkit.event.entity.EntityToggleSwimEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.event.player.PlayerRespawnEvent
+import kotlin.time.Duration.Companion.milliseconds
 
 class WingsListener(
     private val wingsManager: WingsManager,
@@ -64,6 +68,32 @@ class WingsListener(
                 wingsManager.spawnWings(player)
             } else {
                 wingsManager.despawnWingsByPlayer(player)
+            }
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    fun onEntityMount(event: EntityMountEvent) {
+        val player = event.mount as? Player ?: return
+        val passenger = event.entity
+
+        if (passenger.scoreboardTags.contains("cwm_wings")) return
+
+        scope.launch {
+            wingsManager.despawnWingsByPlayer(player)
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    fun onEntityDismount(event: EntityDismountEvent) {
+        val player = event.dismounted as? Player ?: return
+        val passenger = event.entity
+        if (passenger.scoreboardTags.contains("cwm_wings")) return
+        val realPassengersCount = player.passengers.count { !it.scoreboardTags.contains("cwm_wings") }
+        if (realPassengersCount <= 1) {
+            scope.launch {
+                delay(50.milliseconds)
+                wingsManager.spawnWings(player)
             }
         }
     }
