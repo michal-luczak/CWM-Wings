@@ -14,9 +14,8 @@ import org.bukkit.event.player.PlayerRespawnEvent
 
 class WingsListener(
     private val wingsManager: WingsManager,
-    private val scope: CoroutineScope
+    private val scope: CoroutineScope,
 ) : Listener {
-
     @EventHandler
     fun onPlayerJoin(event: PlayerJoinEvent) {
         scope.launch {

@@ -17,22 +17,18 @@ private val VALID_WINGS_PATTERN = Pattern.compile("^[a-zA-Z0-9_]{3,16}$")
 
 class WingsDefinitionArgumentResolver(
     private val wingsManager: WingsManager,
-    private val scope: CoroutineScope
+    private val scope: CoroutineScope,
 ) : ArgumentResolver<CommandSender, WingsDefinitionDto>() {
-
-
     override fun suggest(
         invocation: Invocation<CommandSender>,
         argument: Argument<WingsDefinitionDto>,
-        context: SuggestionContext
-    ): SuggestionResult {
-        return SuggestionResult.of(runBlocking { wingsManager.getWingsDefinitions() })
-    }
+        context: SuggestionContext,
+    ): SuggestionResult = SuggestionResult.of(runBlocking { wingsManager.getWingsDefinitions() })
 
     override fun parse(
         invocation: Invocation<CommandSender>,
         context: Argument<WingsDefinitionDto>,
-        argument: String
+        argument: String,
     ): ParseResult<WingsDefinitionDto> {
         return ParseResult.completableFuture(scope.future { wingsManager.getWingsDefinition(argument) }) { wings ->
             if (wings == null) {
@@ -43,7 +39,9 @@ class WingsDefinitionArgumentResolver(
         }
     }
 
-    override fun match(invocation: Invocation<CommandSender>, context: Argument<WingsDefinitionDto>, argument: String): Boolean {
-        return VALID_WINGS_PATTERN.matcher(argument).matches()
-    }
+    override fun match(
+        invocation: Invocation<CommandSender>,
+        context: Argument<WingsDefinitionDto>,
+        argument: String,
+    ): Boolean = VALID_WINGS_PATTERN.matcher(argument).matches()
 }

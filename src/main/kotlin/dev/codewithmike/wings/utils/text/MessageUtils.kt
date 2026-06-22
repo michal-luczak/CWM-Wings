@@ -26,25 +26,29 @@ fun CommandSender.sendInfoMessage(text: String) {
 }
 
 fun failureComponent(text: String): Component =
-    Component.text("[", NamedTextColor.DARK_GRAY, TextDecoration.BOLD)
-        .append(Component.text("❌", NamedTextColor.DARK_RED,TextDecoration.BOLD))
-        .append(Component.text("] ", NamedTextColor.DARK_GRAY,TextDecoration.BOLD))
+    Component
+        .text("[", NamedTextColor.DARK_GRAY, TextDecoration.BOLD)
+        .append(Component.text("❌", NamedTextColor.DARK_RED, TextDecoration.BOLD))
+        .append(Component.text("] ", NamedTextColor.DARK_GRAY, TextDecoration.BOLD))
         .append(Component.text(text, NamedTextColor.RED).decoration(TextDecoration.BOLD, false))
 
 fun successComponent(text: String): Component =
-    Component.text("[", NamedTextColor.DARK_GRAY, TextDecoration.BOLD)
-        .append(Component.text("✔", NamedTextColor.DARK_GREEN,TextDecoration.BOLD))
-        .append(Component.text("] ", NamedTextColor.DARK_GRAY,TextDecoration.BOLD))
+    Component
+        .text("[", NamedTextColor.DARK_GRAY, TextDecoration.BOLD)
+        .append(Component.text("✔", NamedTextColor.DARK_GREEN, TextDecoration.BOLD))
+        .append(Component.text("] ", NamedTextColor.DARK_GRAY, TextDecoration.BOLD))
         .append(Component.text(text, NamedTextColor.GREEN).decoration(TextDecoration.BOLD, false))
 
 fun loadingComponent(text: String): Component =
-    Component.text("[", NamedTextColor.DARK_GRAY, TextDecoration.BOLD)
-        .append(Component.text("⌛", NamedTextColor.GOLD,TextDecoration.BOLD))
-        .append(Component.text("] ", NamedTextColor.DARK_GRAY,TextDecoration.BOLD))
+    Component
+        .text("[", NamedTextColor.DARK_GRAY, TextDecoration.BOLD)
+        .append(Component.text("⌛", NamedTextColor.GOLD, TextDecoration.BOLD))
+        .append(Component.text("] ", NamedTextColor.DARK_GRAY, TextDecoration.BOLD))
         .append(Component.text(text, NamedTextColor.YELLOW).decoration(TextDecoration.BOLD, false))
 
 fun infoComponent(text: String): Component =
-    Component.text("[", NamedTextColor.DARK_GRAY, TextDecoration.BOLD)
-        .append(Component.text("ℹ", NamedTextColor.AQUA,TextDecoration.BOLD))
-        .append(Component.text("] ", NamedTextColor.DARK_GRAY,TextDecoration.BOLD))
+    Component
+        .text("[", NamedTextColor.DARK_GRAY, TextDecoration.BOLD)
+        .append(Component.text("ℹ", NamedTextColor.AQUA, TextDecoration.BOLD))
+        .append(Component.text("] ", NamedTextColor.DARK_GRAY, TextDecoration.BOLD))
         .append(Component.text(text, NamedTextColor.AQUA).decoration(TextDecoration.BOLD, false))

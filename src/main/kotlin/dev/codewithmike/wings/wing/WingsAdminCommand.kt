@@ -13,23 +13,22 @@ import dev.rollczi.litecommands.annotations.permission.Permission
 import dev.rollczi.litecommands.annotations.shortcut.Shortcut
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Player
 
+@Suppress("Unused")
 @Command(name = "wings", aliases = ["w"])
 @Permission("wings.command.wings")
 class WingsAdminCommand(
     private val wingsManager: WingsManager,
     private val scope: CoroutineScope,
 ) {
-
     @Execute(name = "create")
     @Shortcut("wc")
     fun create(
         @Sender sender: Player,
         @Arg("wings") wings: String,
-        @Arg("itemModel") itemModel: String
+        @Arg("itemModel") itemModel: String,
     ) {
         sender.sendLoadingMessage("Creating wings $wings with item model $itemModel...")
         scope.launch {
@@ -50,7 +49,7 @@ class WingsAdminCommand(
     fun delete(
         @Sender sender: Player,
         @Arg("wings")
-        wings: WingsDefinitionDto
+        wings: WingsDefinitionDto,
     ) {
         sender.sendLoadingMessage("Deleting wings ${wings.wingsDefinitionId}...")
         scope.launch {
@@ -60,13 +59,18 @@ class WingsAdminCommand(
 
     @Shortcut("wg")
     @Execute(name = "grant")
-    fun grant(@Sender sender: Player, @Arg("wings") wings: WingsDefinitionDto, @Arg targetPlayer: OfflinePlayer) {
+    fun grant(
+        @Sender sender: Player,
+        @Arg("wings") wings: WingsDefinitionDto,
+        @Arg targetPlayer: OfflinePlayer,
+    ) {
         sender.sendLoadingMessage("Giving wings ${wings.wingsDefinitionId} to ${targetPlayer.name}...")
         scope.launch {
-            val result = wingsManager.giveWingsToPlayer(
-                wings.wingsDefinitionId,
-                targetPlayer
-            )
+            val result =
+                wingsManager.giveWingsToPlayer(
+                    wings.wingsDefinitionId,
+                    targetPlayer,
+                )
             when (result.result) {
                 WingsResult.WingsResultType.SUCCESS -> {
                     sender.sendSuccessMessage("Successfully given wings!")
@@ -80,7 +84,10 @@ class WingsAdminCommand(
 
     @Shortcut("wr")
     @Execute(name = "revoke")
-    fun revoke(@Sender sender: Player, @Arg targetPlayer: OfflinePlayer) {
+    fun revoke(
+        @Sender sender: Player,
+        @Arg targetPlayer: OfflinePlayer,
+    ) {
         sender.sendLoadingMessage("Removing wings from ${targetPlayer.name}...")
         scope.launch {
             val result = wingsManager.removeWingsFromPlayer(targetPlayer)
@@ -97,7 +104,9 @@ class WingsAdminCommand(
 
     @Shortcut("wrl")
     @Execute(name = "reload")
-    fun reload(@Context sender: Player) {
+    fun reload(
+        @Context sender: Player,
+    ) {
         sender.sendLoadingMessage("Reloading wings...")
         wingsManager.despawnAllWings()
         scope.launch {
@@ -108,15 +117,17 @@ class WingsAdminCommand(
 
     data class WingsResult(
         val reason: String? = null,
-        val result: WingsResultType
+        val result: WingsResultType,
     ) {
         companion object {
-            fun failure(reason: String) : WingsResult = WingsResult(reason, WingsResultType.FAILURE)
-            fun success() : WingsResult = WingsResult(result = WingsResultType.SUCCESS)
+            fun failure(reason: String): WingsResult = WingsResult(reason, WingsResultType.FAILURE)
+
+            fun success(): WingsResult = WingsResult(result = WingsResultType.SUCCESS)
         }
 
         enum class WingsResultType {
-            SUCCESS, FAILURE
+            SUCCESS,
+            FAILURE,
         }
     }
 }

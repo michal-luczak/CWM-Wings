@@ -5,19 +5,18 @@ import com.zaxxer.hikari.HikariDataSource
 import dev.codewithmike.wings.data.definition.WingsDefinitionTable
 import dev.codewithmike.wings.data.player.PlayerWingsTable
 import org.flywaydb.core.Flyway
-import org.jetbrains.exposed.v1.jdbc.Database
-import org.jetbrains.exposed.v1.jdbc.selectAll
-import org.jetbrains.exposed.v1.jdbc.deleteWhere
-import org.jetbrains.exposed.v1.jdbc.upsert
-import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.jdbc.Database
+import org.jetbrains.exposed.v1.jdbc.deleteWhere
+import org.jetbrains.exposed.v1.jdbc.selectAll
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
+import org.jetbrains.exposed.v1.jdbc.upsert
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.io.File
 
 class CascadeDeleteTest {
-
     private lateinit var dataSource: HikariDataSource
 
     @BeforeEach
@@ -25,14 +24,16 @@ class CascadeDeleteTest {
         val dbFile = File("test-database.db")
         if (dbFile.exists()) dbFile.delete()
 
-        val dbConfig = HikariConfig().apply {
-            jdbcUrl = "jdbc:sqlite:test-database.db"
-            maximumPoolSize = 1
-            connectionInitSql = "PRAGMA foreign_keys = ON"
-        }
+        val dbConfig =
+            HikariConfig().apply {
+                jdbcUrl = "jdbc:sqlite:test-database.db"
+                maximumPoolSize = 1
+                connectionInitSql = "PRAGMA foreign_keys = ON"
+            }
         dataSource = HikariDataSource(dbConfig)
 
-        Flyway.configure()
+        Flyway
+            .configure()
             .dataSource(dataSource)
             .locations("filesystem:src/main/resources/db/migration")
             .load()

@@ -13,27 +13,29 @@ import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
 class WingsManager {
-
     private val wingEntities: MutableMap<UUID, Wings> = ConcurrentHashMap()
 
-    suspend fun doesPlayerHaveWings(player: Player): Boolean = withContext(BukkitDispatchers.async) {
-        PlayerWingsRepository.get(player.uniqueId) != null
-    }
+    suspend fun doesPlayerHaveWings(player: Player): Boolean =
+        withContext(BukkitDispatchers.async) {
+            PlayerWingsRepository.get(player.uniqueId) != null
+        }
 
     suspend fun giveWingsToPlayer(
         wings: String,
-        offlinePlayer: OfflinePlayer
+        offlinePlayer: OfflinePlayer,
     ): WingsAdminCommand.WingsResult {
         val uuid = offlinePlayer.uniqueId
         return try {
-            val wingsDefinition: WingsDefinitionDto = withContext(BukkitDispatchers.async) {
-                val wingsDefinitionDto = WingsDefinitionRepository.getWingsDefinition(wings)
-                    ?: return@withContext null
-                PlayerWingsRepository.grant(uuid, wingsDefinitionDto.wingsDefinitionId)
-                wingsDefinitionDto
-            } ?: return WingsAdminCommand.WingsResult.failure(
-                "No such wings $wings"
-            )
+            val wingsDefinition: WingsDefinitionDto =
+                withContext(BukkitDispatchers.async) {
+                    val wingsDefinitionDto =
+                        WingsDefinitionRepository.getWingsDefinition(wings)
+                            ?: return@withContext null
+                    PlayerWingsRepository.grant(uuid, wingsDefinitionDto.wingsDefinitionId)
+                    wingsDefinitionDto
+                } ?: return WingsAdminCommand.WingsResult.failure(
+                    "No such wings $wings",
+                )
             withContext(BukkitDispatchers.main) {
                 offlinePlayer.player?.let { player ->
                     despawnWingsByPlayer(player)
@@ -44,20 +46,18 @@ class WingsManager {
             WingsAdminCommand.WingsResult.success()
         } catch (ex: Exception) {
             WingsAdminCommand.WingsResult.failure(
-                "Internal error: ${ex.message ?: "unknown"}"
+                "Internal error: ${ex.message ?: "unknown"}",
             )
         }
     }
 
-    suspend fun removeWingsFromPlayer(
-        offlinePlayer: OfflinePlayer
-    ): WingsAdminCommand.WingsResult {
+    suspend fun removeWingsFromPlayer(offlinePlayer: OfflinePlayer): WingsAdminCommand.WingsResult {
         val playerUuid = offlinePlayer.uniqueId
         withContext(BukkitDispatchers.async) {
             if (PlayerWingsRepository.get(playerUuid) == null) {
                 return@withContext WingsAdminCommand.WingsResult(
                     result = WingsAdminCommand.WingsResult.WingsResultType.FAILURE,
-                    reason = "Player ${offlinePlayer.name} has no wings"
+                    reason = "Player ${offlinePlayer.name} has no wings",
                 )
             }
         }
@@ -94,11 +94,12 @@ class WingsManager {
     }
 
     suspend fun spawnWings(player: Player) {
-        val pair = withContext(BukkitDispatchers.async) {
-            val playerWings = PlayerWingsRepository.get(player.uniqueId) ?: return@withContext null
-            val definition = WingsDefinitionRepository.getWingsDefinition(playerWings.wingsDefinitionId) ?: return@withContext null
-            playerWings to definition
-        } ?: return
+        val pair =
+            withContext(BukkitDispatchers.async) {
+                val playerWings = PlayerWingsRepository.get(player.uniqueId) ?: return@withContext null
+                val definition = WingsDefinitionRepository.getWingsDefinition(playerWings.wingsDefinitionId) ?: return@withContext null
+                playerWings to definition
+            } ?: return
 
         val (playerWings, wingsDefinition) = pair
 
@@ -109,9 +110,10 @@ class WingsManager {
     }
 
     suspend fun respawnAllWings() {
-        val allItemModels = withContext(BukkitDispatchers.async) {
-            WingsDefinitionRepository.getAllItemModels()
-        }
+        val allItemModels =
+            withContext(BukkitDispatchers.async) {
+                WingsDefinitionRepository.getAllItemModels()
+            }
         withContext(BukkitDispatchers.main) {
             despawnAllWings()
             PlayerWingsRepository.findAll().forEach { playerWingsDto ->
@@ -125,7 +127,10 @@ class WingsManager {
         }
     }
 
-    suspend fun createWingsDefinition(wingsName: String, itemModel: String): WingsAdminCommand.WingsResult {
+    suspend fun createWingsDefinition(
+        wingsName: String,
+        itemModel: String,
+    ): WingsAdminCommand.WingsResult {
         return withContext(BukkitDispatchers.async) {
             WingsDefinitionRepository.createWingsDefinition(wingsName, itemModel)
             return@withContext WingsAdminCommand.WingsResult.success()
@@ -141,13 +146,15 @@ class WingsManager {
         }
     }
 
-    suspend fun getWingsDefinition(wingsDefinitionId: String): WingsDefinitionDto? = withContext(BukkitDispatchers.async) {
-        WingsDefinitionRepository.getWingsDefinition(wingsDefinitionId)
-    }
+    suspend fun getWingsDefinition(wingsDefinitionId: String): WingsDefinitionDto? =
+        withContext(BukkitDispatchers.async) {
+            WingsDefinitionRepository.getWingsDefinition(wingsDefinitionId)
+        }
 
-    suspend fun getWingsDefinitions(): Collection<String> = withContext(BukkitDispatchers.async) {
-        WingsDefinitionRepository.getAllItemModels().keys
-    }
+    suspend fun getWingsDefinitions(): Collection<String> =
+        withContext(BukkitDispatchers.async) {
+            WingsDefinitionRepository.getAllItemModels().keys
+        }
 
     suspend fun turnOnWings(playerUuid: UUID) {
         withContext(BukkitDispatchers.async) {
@@ -180,7 +187,11 @@ class WingsManager {
         }
     }
 
-    private fun spawnWings(player: Player, itemModel: String, wingsDefinitionId: String) {
+    private fun spawnWings(
+        player: Player,
+        itemModel: String,
+        wingsDefinitionId: String,
+    ) {
         val uuid = player.uniqueId
         wingEntities[uuid]?.despawn()
         wingEntities[uuid] = Wings(itemModel, wingsDefinitionId, player)

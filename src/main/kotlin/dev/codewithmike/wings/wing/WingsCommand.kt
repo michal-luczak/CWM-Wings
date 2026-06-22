@@ -20,14 +20,17 @@ class WingsCommand(
     private val wingsManager: WingsManager,
     private val scope: CoroutineScope,
 ) {
-
     @Execute
-    fun helpDefault(@Sender sender: CommandSender) {
+    fun helpDefault(
+        @Sender sender: CommandSender,
+    ) {
         showHelp(sender)
     }
 
     @Execute(name = "help")
-    fun help(@Sender sender: CommandSender) {
+    fun help(
+        @Sender sender: CommandSender,
+    ) {
         showHelp(sender)
     }
 
@@ -47,7 +50,9 @@ class WingsCommand(
 
     @Shortcut("woff")
     @Execute(name = "off")
-    fun turnOffWings(@Sender sender: Player) {
+    fun turnOffWings(
+        @Sender sender: Player,
+    ) {
         scope.launch {
             val doesPlayerHaveWings = wingsManager.doesPlayerHaveWings(sender)
             if (doesPlayerHaveWings) {
@@ -61,7 +66,9 @@ class WingsCommand(
 
     @Shortcut("won")
     @Execute(name = "on")
-    fun turnOnWings(@Sender sender: Player) {
+    fun turnOnWings(
+        @Sender sender: Player,
+    ) {
         scope.launch {
             val doesPlayerHaveWings = wingsManager.doesPlayerHaveWings(sender)
             if (doesPlayerHaveWings) {

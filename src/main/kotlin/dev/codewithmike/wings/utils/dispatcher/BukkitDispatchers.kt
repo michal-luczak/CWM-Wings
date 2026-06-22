@@ -5,7 +5,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 
 object BukkitDispatchers {
-
     private var mainDispatcher: CoroutineDispatcher? = null
 
     fun init() {
@@ -13,8 +12,9 @@ object BukkitDispatchers {
     }
 
     val main: CoroutineDispatcher
-        get() = checkNotNull(mainDispatcher) {
-            "BukkitDispatchers has not been initialized"
-        }
+        get() =
+            checkNotNull(mainDispatcher) {
+                "BukkitDispatchers has not been initialized"
+            }
     val async: CoroutineDispatcher = Dispatchers.IO
 }

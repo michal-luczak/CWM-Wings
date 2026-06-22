@@ -6,10 +6,12 @@ import org.bukkit.Bukkit
 import kotlin.coroutines.CoroutineContext
 
 class BukkitMainDispatcher(
-    private val plugin: CWMWings
+    private val plugin: CWMWings,
 ) : CoroutineDispatcher() {
-
-    override fun dispatch(context: CoroutineContext, block: Runnable) {
+    override fun dispatch(
+        context: CoroutineContext,
+        block: Runnable,
+    ) {
         if (Bukkit.isPrimaryThread()) {
             block.run()
         } else {

@@ -24,9 +24,7 @@ import org.bukkit.plugin.java.JavaPlugin
 import org.flywaydb.core.Flyway
 import org.jetbrains.exposed.v1.jdbc.Database
 
-
 class CWMWings : JavaPlugin() {
-
     private lateinit var wingsManager: WingsManager
     private lateinit var liteCommands: LiteCommands<CommandSender>
     private lateinit var scope: CoroutineScope
@@ -38,30 +36,34 @@ class CWMWings : JavaPlugin() {
     override fun onEnable() {
         instance = this
         BukkitDispatchers.init()
-        scope = CoroutineScope(
-            SupervisorJob() + Dispatchers.Default
-        )
+        scope =
+            CoroutineScope(
+                SupervisorJob() + Dispatchers.Default,
+            )
         wingsManager = WingsManager()
 
-        val dbConfig = HikariConfig().apply {
-            if (!dataFolder.exists()) dataFolder.mkdirs()
-            jdbcUrl = "jdbc:sqlite:${dataFolder}/database.db"
-            maximumPoolSize = 5
-            poolName = "MyPluginPool"
-            connectionInitSql = "PRAGMA foreign_keys = ON"
-        }
-        this.liteCommands = LiteBukkitFactory.builder("cwm-wings", this)
-            .commands(
-                WingsAdminCommand(wingsManager, scope),
-                WingsCommand(wingsManager, scope),
-            )
-            .argument(WingsDefinitionDto::class.java, WingsDefinitionArgumentResolver(wingsManager, scope))
-            .message(LiteMessages.INVALID_USAGE, failureComponent("Invalid command usage. Type /wings help"))
-            .extension(LiteAdventureExtension())
-            .build()
+        val dbConfig =
+            HikariConfig().apply {
+                if (!dataFolder.exists()) dataFolder.mkdirs()
+                jdbcUrl = "jdbc:sqlite:$dataFolder/database.db"
+                maximumPoolSize = 5
+                poolName = "MyPluginPool"
+                connectionInitSql = "PRAGMA foreign_keys = ON"
+            }
+        this.liteCommands =
+            LiteBukkitFactory
+                .builder("cwm-wings", this)
+                .commands(
+                    WingsAdminCommand(wingsManager, scope),
+                    WingsCommand(wingsManager, scope),
+                ).argument(WingsDefinitionDto::class.java, WingsDefinitionArgumentResolver(wingsManager, scope))
+                .message(LiteMessages.INVALID_USAGE, failureComponent("Invalid command usage. Type /wings help"))
+                .extension(LiteAdventureExtension())
+                .build()
 
         val dataSource = HikariDataSource(dbConfig)
-        Flyway.configure(classLoader)
+        Flyway
+            .configure(classLoader)
             .dataSource(dataSource)
             .locations("db/migration")
             .load()

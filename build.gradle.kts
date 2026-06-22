@@ -2,6 +2,7 @@ plugins {
     kotlin("jvm") version libs.versions.kotlin.get()
     alias(libs.plugins.shadow)
     alias(libs.plugins.run.paper)
+    alias(libs.plugins.spotless)
 }
 
 repositories {
@@ -50,7 +51,7 @@ tasks {
         jvmArgs(
             "-Xms2G",
             "-Xmx2G",
-            "-Dcom.mojang.eula.agree=true"
+            "-Dcom.mojang.eula.agree=true",
         )
     }
 
@@ -59,5 +60,26 @@ tasks {
         filesMatching("plugin.yml") {
             expand(props)
         }
+    }
+}
+
+spotless {
+    kotlin {
+        ktlint()
+    }
+    kotlinGradle {
+        ktlint()
+    }
+    format("misc") {
+        target("*.gradle", ".gitattributes", ".gitignore")
+        trimTrailingWhitespace()
+        leadingTabsToSpaces()
+        endWithNewline()
+    }
+    format("toml") {
+        target("**/*.toml")
+        trimTrailingWhitespace()
+        leadingTabsToSpaces()
+        endWithNewline()
     }
 }
