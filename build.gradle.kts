@@ -47,6 +47,12 @@ tasks {
     }
 
     runServer {
+        val toolchains = project.extensions.getByType<JavaToolchainService>()
+        javaLauncher.set(
+            toolchains.launcherFor {
+                languageVersion.set(JavaLanguageVersion.of(25))
+            }
+        )
         minecraftVersion(project.findProperty("mcVersion")?.toString() ?: libs.versions.minecraft.get())
         jvmArgs(
             "-Xms2G",
@@ -56,7 +62,7 @@ tasks {
         pluginJars.from(shadowJar)
     }
 
-    version = System.getenv("GITHUB_REF_NAME")?.removePrefix("v") ?: "0.1.0-SNAPSHOT"
+    version = System.getenv("GITHUB_REF_NAME")?.removePrefix("v") ?: version
 
     processResources {
         val props = mapOf("version" to version)
