@@ -37,6 +37,7 @@ class WingsAdminCommand(
                 WingsResult.WingsResultType.SUCCESS -> {
                     sender.sendSuccessMessage("Successfully given wings!")
                 }
+
                 WingsResult.WingsResultType.FAILURE -> {
                     sender.sendFailureMessage("Error: ${result.reason}")
                 }
@@ -75,6 +76,7 @@ class WingsAdminCommand(
                 WingsResult.WingsResultType.SUCCESS -> {
                     sender.sendSuccessMessage("Successfully given wings!")
                 }
+
                 WingsResult.WingsResultType.FAILURE -> {
                     sender.sendFailureMessage("Error: ${result.reason}")
                 }
@@ -95,6 +97,7 @@ class WingsAdminCommand(
                 WingsResult.WingsResultType.SUCCESS -> {
                     sender.sendSuccessMessage("Successfully removed wings!")
                 }
+
                 WingsResult.WingsResultType.FAILURE -> {
                     sender.sendFailureMessage("Error: ${result.reason}")
                 }
