@@ -51,7 +51,7 @@ tasks {
         javaLauncher.set(
             toolchains.launcherFor {
                 languageVersion.set(JavaLanguageVersion.of(25))
-            }
+            },
         )
         minecraftVersion(project.findProperty("mcVersion")?.toString() ?: libs.versions.minecraft.get())
         jvmArgs(
